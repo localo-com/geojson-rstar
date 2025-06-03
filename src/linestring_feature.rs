@@ -93,7 +93,7 @@ impl GenericFeature<LineStringFeature, LineStringType> for LineStringFeature {
         geometry: &LineStringType,
         feature: &geojson::Feature,
     ) -> Result<(), GeoJsonConversionError> {
-        let euclidean_length: f64 = create_geo_line_string(&geometry).length::<Euclidean>();
+        let euclidean_length: f64 = Euclidean.length(&create_geo_line_string(&geometry));
         if (euclidean_length - f64::zero()).abs() < ::std::f64::EPSILON {
             let id = feature.id.clone();
             return Err(GeoJsonConversionError::MalformedGeometry(id));

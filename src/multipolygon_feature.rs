@@ -153,6 +153,6 @@ impl PointDistance for MultiPolygonFeature {
         point: &<Self::Envelope as Envelope>::Point,
     ) -> <<Self::Envelope as Envelope>::Point as Point>::Scalar {
         let p: geo::Point<f64> = (*point).into();
-        Euclidean::distance(&self.geo_polygons(), &p).powi(2)
+        Euclidean.distance(&self.geo_polygons(), &p).powi(2)
     }
 }
