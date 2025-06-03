@@ -6,7 +6,7 @@ Adding this library as a dependency:
 
 ```toml
 [dependencies]
-geojson-rstar = { git = "https://github.com/boydjohnson/geojson-rstar }
+geojson-rstar = { git = "https://github.com/localo-com/geojson-rstar" }
 ```
 
 Check out the tests directory for usage
