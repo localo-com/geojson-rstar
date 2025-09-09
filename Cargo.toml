@@ -5,7 +5,7 @@ authors = ["Boyd Johnson <johnson.boyd@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-geo = "^0.30"
+geo = "^0.31"
 geojson = "^0.24"
 num-traits = "^0.2"
 rstar = "^0.12"
