@@ -47,16 +47,16 @@ impl MultiPolygonFeature {
     }
 }
 
-impl Into<geojson::Feature> for MultiPolygonFeature {
-    fn into(self) -> geojson::Feature {
-        let geometry = geojson::Geometry::new(geojson::Value::MultiPolygon(self.polygons));
+impl From<MultiPolygonFeature> for geojson::Feature {
+    fn from(val: MultiPolygonFeature) -> Self {
+        let geometry = geojson::Geometry::new(geojson::Value::MultiPolygon(val.polygons));
 
         geojson::Feature {
-            id: self.id,
-            properties: self.properties,
-            foreign_members: self.foreign_members,
+            id: val.id,
+            properties: val.properties,
+            foreign_members: val.foreign_members,
             geometry: Some(geometry),
-            bbox: Some(self.bbox),
+            bbox: Some(val.bbox),
         }
     }
 }

@@ -46,16 +46,16 @@ impl LineStringFeature {
     }
 }
 
-impl Into<geojson::Feature> for LineStringFeature {
-    fn into(self) -> geojson::Feature {
-        let geometry = geojson::Geometry::new(geojson::Value::LineString(self.line));
+impl From<LineStringFeature> for geojson::Feature {
+    fn from(val: LineStringFeature) -> Self {
+        let geometry = geojson::Geometry::new(geojson::Value::LineString(val.line));
 
         geojson::Feature {
-            id: self.id,
-            properties: self.properties,
-            foreign_members: self.foreign_members,
+            id: val.id,
+            properties: val.properties,
+            foreign_members: val.foreign_members,
             geometry: Some(geometry),
-            bbox: Some(self.bbox),
+            bbox: Some(val.bbox),
         }
     }
 }
@@ -93,8 +93,8 @@ impl GenericFeature<LineStringFeature, LineStringType> for LineStringFeature {
         geometry: &LineStringType,
         feature: &geojson::Feature,
     ) -> Result<(), GeoJsonConversionError> {
-        let euclidean_length: f64 = Euclidean.length(&create_geo_line_string(&geometry));
-        if (euclidean_length - f64::zero()).abs() < ::std::f64::EPSILON {
+        let euclidean_length: f64 = Euclidean.length(&create_geo_line_string(geometry));
+        if (euclidean_length - f64::zero()).abs() < f64::EPSILON {
             let id = feature.id.clone();
             return Err(GeoJsonConversionError::MalformedGeometry(id));
         }

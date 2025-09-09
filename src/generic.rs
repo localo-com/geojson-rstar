@@ -49,7 +49,7 @@ pub(crate) trait GetBbox<'a> {
         AABB::from_points(
             [
                 [
-                    *self.bbox().get(0).expect("A bounding box has 4 values"),
+                    *self.bbox().first().expect("A bounding box has 4 values"),
                     *self.bbox().get(1).expect("A bounding box has 4 values"),
                 ],
                 [

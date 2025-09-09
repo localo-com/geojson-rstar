@@ -116,9 +116,9 @@ impl TryFrom<geojson::Feature> for Feature {
     }
 }
 
-impl Into<geojson::Feature> for Feature {
-    fn into(self) -> geojson::Feature {
-        match self {
+impl From<Feature> for geojson::Feature {
+    fn from(val: Feature) -> Self {
+        match val {
             Feature::Point(p) => p.into(),
             Feature::LineString(l) => l.into(),
             Feature::Polygon(p) => p.into(),
