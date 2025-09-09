@@ -74,3 +74,18 @@ fn test_nearest_neighbor() {
         panic!("The geojson did not parse as a FeatureCollection correctly");
     }
 }
+
+#[test]
+fn test_point_rejects_malformed_coordinates() {
+    // 3D coordinates should be rejected by PointFeature
+    let bad_point = r#"{
+        "type": "Feature",
+        "properties": {},
+        "geometry": { "type": "Point", "coordinates": [0.0, 0.0, 1.0] }
+    }"#;
+
+    if let GeoJson::Feature(feature) = bad_point.parse::<GeoJson>().unwrap() {
+        let res: Result<PointFeature, _> = feature.try_into();
+        assert!(res.is_err(), "Point with 3 ordinates should be rejected");
+    }
+}

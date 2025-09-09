@@ -25,6 +25,26 @@ fn test_try_from_polygon_success() {
 }
 
 #[test]
+fn test_polygon_rejects_empty_or_malformed() {
+    // Empty polygon -> malformed
+    let empty_poly = r#"{ "type": "Feature", "properties": {}, "geometry": { "type": "Polygon", "coordinates": [] } }"#;
+    if let GeoJson::Feature(f) = empty_poly.parse::<GeoJson>().unwrap() {
+        let res: Result<PolygonFeature, _> = f.try_into();
+        assert!(res.is_err(), "Empty Polygon should be malformed");
+    }
+
+    // Polygon with a position that has 3 ordinates -> malformed
+    let malformed_poly = r#"{ "type": "Feature", "properties": {}, "geometry": { "type": "Polygon", "coordinates": [ [ [0,0,0], [1,0], [1,1], [0,1], [0,0] ] ] } }"#;
+    if let GeoJson::Feature(f) = malformed_poly.parse::<GeoJson>().unwrap() {
+        let res: Result<PolygonFeature, _> = f.try_into();
+        assert!(
+            res.is_err(),
+            "Polygon with malformed coordinates should be rejected"
+        );
+    }
+}
+
+#[test]
 fn test_nearest_neighbor() {
     let polygon_geojson = r#"{
 "type": "FeatureCollection",
@@ -34,8 +54,7 @@ fn test_nearest_neighbor() {
 { "type": "Feature", "properties": { "STATEFP": "53", "COUNTYFP": "069", "COUNTYNS": "01513275", "GEOID": "53069", "NAME": "Wahkiakum", "NAMELSAD": "Wahkiakum County", "LSAD": "06", "CLASSFP": "H1", "MTFCC": "G4020", "CSAFP": null, "CBSAFP": null, "METDIVFP": null, "FUNCSTAT": "A", "ALAND": 680956809, "AWATER": 61588406, "INTPTLAT": "+46.2946377", "INTPTLON": "-123.4244583" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -123.436394, 46.238197 ], [ -123.728316, 46.264541 ], [ -123.726557, 46.384872 ], [ -123.21795, 46.385617 ], [ -123.436394, 46.238197 ] ] ] } },
 { "type": "Feature", "properties": { "STATEFP": "26", "COUNTYFP": "035", "COUNTYNS": "01622960", "GEOID": "26035", "NAME": "Clare", "NAMELSAD": "Clare County", "LSAD": "06", "CLASSFP": "H1", "MTFCC": "G4020", "CSAFP": null, "CBSAFP": null, "METDIVFP": null, "FUNCSTAT": "A", "ALAND": 1461700230, "AWATER": 28500463, "INTPTLAT": "+43.9911368", "INTPTLON": "-084.8383253" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -85.087602, 44.07366 ], [ -84.608104, 44.160482 ], [ -84.606037, 43.815365 ], [ -85.088811, 43.813676 ], [ -85.087602, 44.07366 ] ] ] } }
 ]
-}
-"#;
+}"#;
 
     let search_point = [-118.0, 34.0];
 
