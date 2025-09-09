@@ -40,16 +40,16 @@ impl GeometryCollectionFeature {
     }
 }
 
-impl Into<geojson::Feature> for GeometryCollectionFeature {
-    fn into(self) -> geojson::Feature {
-        let geometry = geojson::Geometry::new(geojson::Value::GeometryCollection(self.geometries));
+impl From<GeometryCollectionFeature> for geojson::Feature {
+    fn from(val: GeometryCollectionFeature) -> Self {
+        let geometry = geojson::Geometry::new(geojson::Value::GeometryCollection(val.geometries));
 
         geojson::Feature {
-            id: self.id,
-            properties: self.properties,
-            foreign_members: self.foreign_members,
+            id: val.id,
+            properties: val.properties,
+            foreign_members: val.foreign_members,
             geometry: Some(geometry),
-            bbox: Some(self.bbox),
+            bbox: Some(val.bbox),
         }
     }
 }
@@ -88,20 +88,17 @@ impl GenericFeature<GeometryCollectionFeature, Vec<Geometry>> for GeometryCollec
         feature: &geojson::Feature,
     ) -> Result<(), GeoJsonConversionError> {
         for geom in geometry {
-            let res = match &geom.value {
-                Value::Point(p) => PointFeature::check_geometry(&p, feature),
-                Value::LineString(l) => LineStringFeature::check_geometry(&l, feature),
-                Value::Polygon(p) => PolygonFeature::check_geometry(&p, feature),
-                Value::MultiPoint(p) => MultiPointFeature::check_geometry(&p, feature),
-                Value::MultiLineString(l) => MultiLineStringFeature::check_geometry(&l, feature),
-                Value::MultiPolygon(p) => MultiPolygonFeature::check_geometry(&p, feature),
+            match &geom.value {
+                Value::Point(p) => PointFeature::check_geometry(p, feature)?,
+                Value::LineString(l) => LineStringFeature::check_geometry(l, feature)?,
+                Value::Polygon(p) => PolygonFeature::check_geometry(p, feature)?,
+                Value::MultiPoint(p) => MultiPointFeature::check_geometry(p, feature)?,
+                Value::MultiLineString(l) => MultiLineStringFeature::check_geometry(l, feature)?,
+                Value::MultiPolygon(p) => MultiPolygonFeature::check_geometry(p, feature)?,
                 Value::GeometryCollection(g) => {
-                    GeometryCollectionFeature::check_geometry(&g, feature)
+                    GeometryCollectionFeature::check_geometry(g, feature)?
                 }
             };
-            if res.is_err() {
-                return res;
-            }
         }
         Ok(())
     }

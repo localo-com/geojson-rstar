@@ -47,16 +47,16 @@ impl MultiPointFeature {
     }
 }
 
-impl Into<geojson::Feature> for MultiPointFeature {
-    fn into(self) -> geojson::Feature {
-        let geometry = geojson::Geometry::new(geojson::Value::MultiPoint(self.points));
+impl From<MultiPointFeature> for geojson::Feature {
+    fn from(val: MultiPointFeature) -> Self {
+        let geometry = geojson::Geometry::new(geojson::Value::MultiPoint(val.points));
 
         geojson::Feature {
-            id: self.id,
-            properties: self.properties,
-            foreign_members: self.foreign_members,
+            id: val.id,
+            properties: val.properties,
+            foreign_members: val.foreign_members,
             geometry: Some(geometry),
-            bbox: Some(self.bbox),
+            bbox: Some(val.bbox),
         }
     }
 }

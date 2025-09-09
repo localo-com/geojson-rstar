@@ -48,16 +48,16 @@ impl PolygonFeature {
     }
 }
 
-impl Into<geojson::Feature> for PolygonFeature {
-    fn into(self) -> geojson::Feature {
-        let geometry = geojson::Geometry::new(geojson::Value::Polygon(self.polygon));
+impl From<PolygonFeature> for geojson::Feature {
+    fn from(val: PolygonFeature) -> Self {
+        let geometry = geojson::Geometry::new(geojson::Value::Polygon(val.polygon));
 
         geojson::Feature {
-            id: self.id,
-            properties: self.properties,
-            foreign_members: self.foreign_members,
+            id: val.id,
+            properties: val.properties,
+            foreign_members: val.foreign_members,
             geometry: Some(geometry),
-            bbox: Some(self.bbox),
+            bbox: Some(val.bbox),
         }
     }
 }

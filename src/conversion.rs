@@ -66,7 +66,7 @@ where
         polygon
             .interiors()
             .iter()
-            .map(|line_string| create_line_string_type(&line_string)),
+            .map(|line_string| create_line_string_type(line_string)),
     );
 
     coords
@@ -79,7 +79,7 @@ where
     multi_polygon
         .0
         .iter()
-        .map(|polygon| create_polygon_type(&polygon))
+        .map(|polygon| create_polygon_type(polygon))
         .collect()
 }
 
@@ -132,7 +132,7 @@ where
     MultiLineString(
         multi_line_type
             .iter()
-            .map(|point_type| create_geo_line_string(&point_type))
+            .map(|point_type| create_geo_line_string(point_type))
             .collect(),
     )
 }
@@ -143,7 +143,7 @@ where
     T: Float + Debug,
 {
     let exterior = polygon_type
-        .get(0)
+        .first()
         .map(|e| create_geo_line_string(e))
         .unwrap_or_else(|| create_geo_line_string(&vec![]));
 
@@ -166,7 +166,7 @@ where
     MultiPolygon(
         multi_polygon_type
             .iter()
-            .map(|polygon_type| create_geo_polygon(&polygon_type))
+            .map(|polygon_type| create_geo_polygon(polygon_type))
             .collect(),
     )
 }
@@ -176,16 +176,16 @@ where
     T: Float + Debug,
 {
     geo::GeometryCollection::from_iter(geometries.iter().map(|g| match &g.value {
-        Value::Point(p) => geo::Geometry::Point(create_geo_point(&p)),
-        Value::LineString(l) => geo::Geometry::LineString(create_geo_line_string(&l)),
-        Value::Polygon(p) => geo::Geometry::Polygon(create_geo_polygon(&p)),
-        Value::MultiPoint(p) => geo::Geometry::MultiPoint(create_geo_multi_point(&p)),
-        Value::MultiPolygon(p) => geo::Geometry::MultiPolygon(create_geo_multi_polygon(&p)),
+        Value::Point(p) => geo::Geometry::Point(create_geo_point(p)),
+        Value::LineString(l) => geo::Geometry::LineString(create_geo_line_string(l)),
+        Value::Polygon(p) => geo::Geometry::Polygon(create_geo_polygon(p)),
+        Value::MultiPoint(p) => geo::Geometry::MultiPoint(create_geo_multi_point(p)),
+        Value::MultiPolygon(p) => geo::Geometry::MultiPolygon(create_geo_multi_polygon(p)),
         Value::MultiLineString(p) => {
-            geo::Geometry::MultiLineString(create_geo_multi_line_string(&p))
+            geo::Geometry::MultiLineString(create_geo_multi_line_string(p))
         }
         Value::GeometryCollection(g) => {
-            geo::Geometry::GeometryCollection(create_geo_geometry_collection(&g))
+            geo::Geometry::GeometryCollection(create_geo_geometry_collection(g))
         }
     }))
 }
