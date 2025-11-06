@@ -16,8 +16,7 @@
 use geo::{Coord, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon};
 use geojson::{Geometry, LineStringType, PointType, PolygonType, Value};
 use num_traits::Float;
-use std::fmt::Debug;
-use std::iter::FromIterator;
+use std::{fmt::Debug, iter::FromIterator};
 
 pub fn create_point_type<T>(point: &Point<T>) -> PointType
 where

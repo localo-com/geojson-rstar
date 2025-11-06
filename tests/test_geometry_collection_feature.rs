@@ -55,8 +55,8 @@ fn test_try_into_geometry_collection_success_and_bbox() {
             .expect("GeometryCollectionFeature conversion should succeed");
 
         // The expected bbox spans from the line's start to the polygon's max
-        assert_eq!(gc_feature.geo_geometry().0.is_empty(), false);
-        assert_eq!(gc_feature.geometries().len() > 0, true);
+        assert!(!gc_feature.geo_geometry().0.is_empty());
+        assert!(!gc_feature.geometries().is_empty());
     } else {
         panic!("The geojson did not parse as a Feature");
     }

@@ -20,8 +20,7 @@ use crate::{
     generic::{GenericFeature, GetBbox},
     json::JsonObject,
 };
-use geo::algorithm::Euclidean;
-use geo::algorithm::{bounding_rect::BoundingRect, Length};
+use geo::algorithm::{bounding_rect::BoundingRect, Euclidean, Length};
 use geojson::{feature::Id, Bbox, LineStringType};
 use num_traits::identities::Zero;
 use rstar::{Envelope, Point, PointDistance, RTreeObject, AABB};
