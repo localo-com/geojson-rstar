@@ -92,23 +92,25 @@ impl TryFrom<geojson::Feature> for Feature {
 
     fn try_from(feature: geojson::Feature) -> Result<Feature, Self::Error> {
         match feature.geometry.as_ref().map(|g| &g.value) {
-            Some(geojson::Value::Point(_)) => PointFeature::try_from(feature).map(Feature::Point),
-            Some(geojson::Value::LineString(_)) => {
+            Some(geojson::GeometryValue::Point { .. }) => {
+                PointFeature::try_from(feature).map(Feature::Point)
+            }
+            Some(geojson::GeometryValue::LineString { .. }) => {
                 LineStringFeature::try_from(feature).map(Feature::LineString)
             }
-            Some(geojson::Value::Polygon(_)) => {
+            Some(geojson::GeometryValue::Polygon { .. }) => {
                 PolygonFeature::try_from(feature).map(Feature::Polygon)
             }
-            Some(geojson::Value::MultiPoint(_)) => {
+            Some(geojson::GeometryValue::MultiPoint { .. }) => {
                 MultiPointFeature::try_from(feature).map(Feature::MultiPoint)
             }
-            Some(geojson::Value::MultiLineString(_)) => {
+            Some(geojson::GeometryValue::MultiLineString { .. }) => {
                 MultiLineStringFeature::try_from(feature).map(Feature::MultiLineString)
             }
-            Some(geojson::Value::MultiPolygon(_)) => {
+            Some(geojson::GeometryValue::MultiPolygon { .. }) => {
                 MultiPolygonFeature::try_from(feature).map(Feature::MultiPolygon)
             }
-            Some(geojson::Value::GeometryCollection(_)) => {
+            Some(geojson::GeometryValue::GeometryCollection { .. }) => {
                 GeometryCollectionFeature::try_from(feature).map(Feature::GeometryCollection)
             }
             None => Err(GeoJsonConversionError::MissingGeometry(feature.id)),

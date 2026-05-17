@@ -48,7 +48,9 @@ impl LineStringFeature {
 
 impl From<LineStringFeature> for geojson::Feature {
     fn from(val: LineStringFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::LineString(val.line));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::LineString {
+            coordinates: val.line,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -72,7 +74,7 @@ impl GenericFeature<LineStringFeature, LineStringType> for LineStringFeature {
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<LineStringType, GeoJsonConversionError> {
-        if let geojson::Value::LineString(linestring_type) = feature
+        if let geojson::GeometryValue::LineString { coordinates } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -81,7 +83,7 @@ impl GenericFeature<LineStringFeature, LineStringType> for LineStringFeature {
             })?
             .value
         {
-            Ok(linestring_type)
+            Ok(coordinates)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find Linestring feature".into(),

@@ -49,7 +49,9 @@ impl MultiPointFeature {
 
 impl From<MultiPointFeature> for geojson::Feature {
     fn from(val: MultiPointFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::MultiPoint(val.points));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::MultiPoint {
+            coordinates: val.points,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -73,7 +75,7 @@ impl GenericFeature<MultiPointFeature, Vec<PointType>> for MultiPointFeature {
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<Vec<PointType>, GeoJsonConversionError> {
-        if let geojson::Value::MultiPoint(points) = feature
+        if let geojson::GeometryValue::MultiPoint { coordinates } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -82,7 +84,7 @@ impl GenericFeature<MultiPointFeature, Vec<PointType>> for MultiPointFeature {
             })?
             .value
         {
-            Ok(points)
+            Ok(coordinates)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find a MultiPoint feature".into(),

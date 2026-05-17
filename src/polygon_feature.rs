@@ -50,7 +50,9 @@ impl PolygonFeature {
 
 impl From<PolygonFeature> for geojson::Feature {
     fn from(val: PolygonFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::Polygon(val.polygon));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::Polygon {
+            coordinates: val.polygon,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -74,7 +76,7 @@ impl GenericFeature<PolygonFeature, PolygonType> for PolygonFeature {
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<PolygonType, GeoJsonConversionError> {
-        if let geojson::Value::Polygon(polygon) = feature
+        if let geojson::GeometryValue::Polygon { coordinates } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -83,7 +85,7 @@ impl GenericFeature<PolygonFeature, PolygonType> for PolygonFeature {
             })?
             .value
         {
-            Ok(polygon)
+            Ok(coordinates)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find Polygon feature".into(),
