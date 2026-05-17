@@ -46,7 +46,9 @@ impl PointFeature {
 
 impl From<PointFeature> for geojson::Feature {
     fn from(val: PointFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::Point(val.point));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::Point {
+            coordinates: val.point,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -70,7 +72,7 @@ impl GenericFeature<PointFeature, PointType> for PointFeature {
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<PointType, GeoJsonConversionError> {
-        if let geojson::Value::Point(point_type) = feature
+        if let geojson::GeometryValue::Point { coordinates } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -79,7 +81,7 @@ impl GenericFeature<PointFeature, PointType> for PointFeature {
             })?
             .value
         {
-            Ok(point_type)
+            Ok(coordinates)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find Point feature".into(),

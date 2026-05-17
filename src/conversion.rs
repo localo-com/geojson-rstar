@@ -14,7 +14,7 @@
 // limitations under the License.
 
 use geo::{Coord, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon};
-use geojson::{Geometry, LineStringType, PointType, PolygonType, Value};
+use geojson::{Geometry, GeometryValue, LineStringType, PointType, PolygonType};
 use num_traits::Float;
 use std::fmt::Debug;
 use std::iter::FromIterator;
@@ -26,7 +26,7 @@ where
     let x: f64 = point.x().to_f64().unwrap();
     let y: f64 = point.y().to_f64().unwrap();
 
-    vec![x, y]
+    vec![x, y].into()
 }
 
 pub fn create_line_string_type<T>(line_string: &LineString<T>) -> LineStringType
@@ -176,16 +176,24 @@ where
     T: Float + Debug,
 {
     geo::GeometryCollection::from_iter(geometries.iter().map(|g| match &g.value {
-        Value::Point(p) => geo::Geometry::Point(create_geo_point(p)),
-        Value::LineString(l) => geo::Geometry::LineString(create_geo_line_string(l)),
-        Value::Polygon(p) => geo::Geometry::Polygon(create_geo_polygon(p)),
-        Value::MultiPoint(p) => geo::Geometry::MultiPoint(create_geo_multi_point(p)),
-        Value::MultiPolygon(p) => geo::Geometry::MultiPolygon(create_geo_multi_polygon(p)),
-        Value::MultiLineString(p) => {
-            geo::Geometry::MultiLineString(create_geo_multi_line_string(p))
+        GeometryValue::Point { coordinates } => geo::Geometry::Point(create_geo_point(coordinates)),
+        GeometryValue::LineString { coordinates } => {
+            geo::Geometry::LineString(create_geo_line_string(coordinates))
         }
-        Value::GeometryCollection(g) => {
-            geo::Geometry::GeometryCollection(create_geo_geometry_collection(g))
+        GeometryValue::Polygon { coordinates } => {
+            geo::Geometry::Polygon(create_geo_polygon(coordinates))
+        }
+        GeometryValue::MultiPoint { coordinates } => {
+            geo::Geometry::MultiPoint(create_geo_multi_point(coordinates))
+        }
+        GeometryValue::MultiPolygon { coordinates } => {
+            geo::Geometry::MultiPolygon(create_geo_multi_polygon(coordinates))
+        }
+        GeometryValue::MultiLineString { coordinates } => {
+            geo::Geometry::MultiLineString(create_geo_multi_line_string(coordinates))
+        }
+        GeometryValue::GeometryCollection { geometries } => {
+            geo::Geometry::GeometryCollection(create_geo_geometry_collection(geometries))
         }
     }))
 }

@@ -18,7 +18,7 @@ use crate::{
     MultiPointFeature, MultiPolygonFeature, PointFeature, PolygonFeature,
 };
 use geo::{algorithm::bounding_rect::BoundingRect, Coord, Rect};
-use geojson::{feature::Id, Bbox, Geometry, Value};
+use geojson::{feature::Id, Bbox, Geometry, GeometryValue};
 use std::convert::TryFrom;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -42,7 +42,9 @@ impl GeometryCollectionFeature {
 
 impl From<GeometryCollectionFeature> for geojson::Feature {
     fn from(val: GeometryCollectionFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::GeometryCollection(val.geometries));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::GeometryCollection {
+            geometries: val.geometries,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -66,7 +68,7 @@ impl GenericFeature<GeometryCollectionFeature, Vec<Geometry>> for GeometryCollec
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<Vec<Geometry>, GeoJsonConversionError> {
-        if let geojson::Value::GeometryCollection(geometry_collection) = feature
+        if let geojson::GeometryValue::GeometryCollection { geometries } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -75,7 +77,7 @@ impl GenericFeature<GeometryCollectionFeature, Vec<Geometry>> for GeometryCollec
             })?
             .value
         {
-            Ok(geometry_collection)
+            Ok(geometries)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find GeometryCollection feature".to_string(),
@@ -89,14 +91,26 @@ impl GenericFeature<GeometryCollectionFeature, Vec<Geometry>> for GeometryCollec
     ) -> Result<(), GeoJsonConversionError> {
         for geom in geometry {
             match &geom.value {
-                Value::Point(p) => PointFeature::check_geometry(p, feature)?,
-                Value::LineString(l) => LineStringFeature::check_geometry(l, feature)?,
-                Value::Polygon(p) => PolygonFeature::check_geometry(p, feature)?,
-                Value::MultiPoint(p) => MultiPointFeature::check_geometry(p, feature)?,
-                Value::MultiLineString(l) => MultiLineStringFeature::check_geometry(l, feature)?,
-                Value::MultiPolygon(p) => MultiPolygonFeature::check_geometry(p, feature)?,
-                Value::GeometryCollection(g) => {
-                    GeometryCollectionFeature::check_geometry(g, feature)?
+                GeometryValue::Point { coordinates } => {
+                    PointFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::LineString { coordinates } => {
+                    LineStringFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::Polygon { coordinates } => {
+                    PolygonFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::MultiPoint { coordinates } => {
+                    MultiPointFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::MultiLineString { coordinates } => {
+                    MultiLineStringFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::MultiPolygon { coordinates } => {
+                    MultiPolygonFeature::check_geometry(coordinates, feature)?
+                }
+                GeometryValue::GeometryCollection { geometries } => {
+                    GeometryCollectionFeature::check_geometry(geometries, feature)?
                 }
             };
         }

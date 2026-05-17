@@ -49,7 +49,9 @@ impl MultiPolygonFeature {
 
 impl From<MultiPolygonFeature> for geojson::Feature {
     fn from(val: MultiPolygonFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::MultiPolygon(val.polygons));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::MultiPolygon {
+            coordinates: val.polygons,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -83,8 +85,8 @@ impl GenericFeature<MultiPolygonFeature, Vec<PolygonType>> for MultiPolygonFeatu
             .value;
 
         match value {
-            geojson::Value::MultiPolygon(polygons) => Ok(polygons),
-            geojson::Value::Polygon(polygon) => Ok(vec![polygon]),
+            geojson::GeometryValue::MultiPolygon { coordinates } => Ok(coordinates),
+            geojson::GeometryValue::Polygon { coordinates } => Ok(vec![coordinates]),
             _ => Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find a MultiPolygon feature".into(),
             )),

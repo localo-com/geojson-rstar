@@ -49,7 +49,9 @@ impl MultiLineStringFeature {
 
 impl From<MultiLineStringFeature> for geojson::Feature {
     fn from(val: MultiLineStringFeature) -> Self {
-        let geometry = geojson::Geometry::new(geojson::Value::MultiLineString(val.lines));
+        let geometry = geojson::Geometry::new(geojson::GeometryValue::MultiLineString {
+            coordinates: val.lines,
+        });
 
         geojson::Feature {
             id: val.id,
@@ -75,7 +77,7 @@ impl GenericFeature<MultiLineStringFeature, Vec<LineStringType>> for MultiLineSt
     fn take_geometry_type(
         feature: &mut geojson::Feature,
     ) -> Result<Vec<LineStringType>, GeoJsonConversionError> {
-        if let geojson::Value::MultiLineString(lines) = feature
+        if let geojson::GeometryValue::MultiLineString { coordinates } = feature
             .geometry
             .take()
             .ok_or_else(|| {
@@ -84,7 +86,7 @@ impl GenericFeature<MultiLineStringFeature, Vec<LineStringType>> for MultiLineSt
             })?
             .value
         {
-            Ok(lines)
+            Ok(coordinates)
         } else {
             Err(GeoJsonConversionError::IncorrectGeometryValue(
                 "Error: did not find a MultiLinestring Feature".into(),
