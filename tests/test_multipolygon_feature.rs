@@ -48,7 +48,7 @@ fn test_multipolygon_nearest_neighbor() {
 
         let tree = RTree::bulk_load(features);
         let nearest = tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest neighbor");
         assert_eq!(
             nearest.properties.as_ref().unwrap().get("NAME"),
