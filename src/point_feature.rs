@@ -137,6 +137,10 @@ impl PointDistance for PointFeature {
         &self,
         point: &<Self::Envelope as Envelope>::Point,
     ) -> <<Self::Envelope as Envelope>::Point as Point>::Scalar {
-        self.geo_point().distance_2(&(*point).into())
+        let p: geo::Point<f64> = (*point).into();
+        let geo_point = self.geo_point();
+        let dx = geo_point.x() - p.x();
+        let dy = geo_point.y() - p.y();
+        dx * dx + dy * dy
     }
 }

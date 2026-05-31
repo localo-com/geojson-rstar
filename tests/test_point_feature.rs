@@ -5,7 +5,7 @@ extern crate serde_json;
 
 use geojson::GeoJson;
 use geojson_rstar::PointFeature;
-use rstar::RTree;
+use rstar::{PointDistance, RTree};
 use std::convert::TryInto;
 
 #[test]
@@ -63,7 +63,7 @@ fn test_nearest_neighbor() {
             .expect("The features were correctly converted as PointFeatures");
         let r_tree = RTree::bulk_load(feature_points);
         let nearest = r_tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest point in the RTree");
 
         assert_eq!(
@@ -72,6 +72,21 @@ fn test_nearest_neighbor() {
         );
     } else {
         panic!("The geojson did not parse as a FeatureCollection correctly");
+    }
+}
+
+#[test]
+fn test_point_distance_2_returns_squared_distance() {
+    let point_geojson = r#"{
+        "type": "Feature",
+        "properties": {},
+        "geometry": { "type": "Point", "coordinates": [0.0, 0.0] }
+    }"#;
+
+    if let GeoJson::Feature(feature) = point_geojson.parse::<GeoJson>().unwrap() {
+        let point_feature: PointFeature = feature.try_into().unwrap();
+
+        assert_eq!(point_feature.distance_2(&[3.0, 4.0]), 25.0);
     }
 }
 

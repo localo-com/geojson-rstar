@@ -5,7 +5,7 @@ extern crate serde_json;
 
 use geojson::GeoJson;
 use geojson_rstar::LineStringFeature;
-use rstar::RTree;
+use rstar::{PointDistance, RTree};
 use std::convert::TryInto;
 
 #[test]
@@ -59,12 +59,27 @@ fn test_nearest_neighbor() {
         let tree = RTree::bulk_load(lsf);
 
         let nearest = tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest neighbor");
         assert_eq!(
             nearest.properties.as_ref().unwrap().get("STREETALL"),
             Some(&serde_json::Value::String("280TH ST W".into())),
             "The closest linestring is correctly found"
         );
+    }
+}
+
+#[test]
+fn test_linestring_distance_2_returns_squared_distance() {
+    let linestring_geojson = r#"{
+        "type": "Feature",
+        "properties": {},
+        "geometry": { "type": "LineString", "coordinates": [[0.0, 0.0], [10.0, 0.0]] }
+    }"#;
+
+    if let GeoJson::Feature(feature) = linestring_geojson.parse::<GeoJson>().unwrap() {
+        let linestring_feature: LineStringFeature = feature.try_into().unwrap();
+
+        assert_eq!(linestring_feature.distance_2(&[3.0, 4.0]), 16.0);
     }
 }
