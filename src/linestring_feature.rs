@@ -20,8 +20,7 @@ use crate::{
     generic::{GenericFeature, GetBbox},
     json::JsonObject,
 };
-use geo::algorithm::Euclidean;
-use geo::algorithm::{bounding_rect::BoundingRect, Length};
+use geo::algorithm::{bounding_rect::BoundingRect, Distance, Euclidean, Length};
 use geojson::{feature::Id, Bbox, LineStringType};
 use num_traits::identities::Zero;
 use rstar::{Envelope, Point, PointDistance, RTreeObject, AABB};
@@ -157,6 +156,7 @@ impl PointDistance for LineStringFeature {
         &self,
         point: &<Self::Envelope as Envelope>::Point,
     ) -> <<Self::Envelope as Envelope>::Point as Point>::Scalar {
-        self.geo_line().distance_2(&(*point).into())
+        let p: geo::Point<f64> = (*point).into();
+        Euclidean.distance(&self.geo_line(), &p).powi(2)
     }
 }

@@ -56,7 +56,7 @@ fn test_multipoint_nearest_neighbor() {
             .expect("The features were correctly converted as MultiPointFeatures");
         let r_tree = RTree::bulk_load(features);
         let nearest = r_tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest MultiPointFeature in the RTree");
 
         assert_eq!(

@@ -63,7 +63,7 @@ fn test_nearest_neighbor() {
             .expect("The features were correctly converted as PointFeatures");
         let r_tree = RTree::bulk_load(feature_points);
         let nearest = r_tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest point in the RTree");
 
         assert_eq!(

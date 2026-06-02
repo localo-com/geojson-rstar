@@ -69,7 +69,7 @@ fn test_nearest_neighbor() {
         let tree = RTree::bulk_load(feature_polygons);
 
         let nearest = tree
-            .nearest_neighbor(&search_point)
+            .nearest_neighbor(search_point)
             .expect("There is a nearest polygon");
         assert_eq!(
             nearest.properties.as_ref().unwrap().get("STATEFP"),
