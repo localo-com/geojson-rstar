@@ -20,7 +20,6 @@ use crate::{
     generic::{GenericFeature, GetBbox},
     json::JsonObject,
 };
-use geo::{Distance, Euclidean};
 use geojson::{feature::Id, Bbox, PointType};
 use rstar::{Envelope, Point, PointDistance, RTreeObject, AABB};
 use std::convert::TryFrom;
@@ -138,7 +137,8 @@ impl PointDistance for PointFeature {
         &self,
         point: &<Self::Envelope as Envelope>::Point,
     ) -> <<Self::Envelope as Envelope>::Point as Point>::Scalar {
-        let p: geo::Point<f64> = (*point).into();
-        Euclidean.distance(&self.geo_point(), &p).powi(2)
+        let dx = self.point[0] - point[0];
+        let dy = self.point[1] - point[1];
+        dx * dx + dy * dy
     }
 }
